@@ -123,6 +123,7 @@ function triggerBreak() {
         // Calculate the new, equal duration for the remaining content segments
         const newSegmentDuration = remainingContentTime / remainingContentSegments;
         
+        // The NEXT break is scheduled to start after this current break finishes, plus the new segment duration.
         nextBreakTrtStartMs = currentTrtElapsedMs + breakDurationMs + newSegmentDuration;
         
         console.log(`[Dynamic TRT] Next break (${currentBreakIndex + 1}) scheduled at TRT: ${formatTime(nextBreakTrtStartMs)}`);
@@ -151,8 +152,11 @@ function triggerBreak() {
             // 5. Update UI info panel
             document.getElementById('breaks-remaining').textContent = breakCount - currentBreakIndex;
             
-            // FIX: Set isRunning to false BEFORE calling startTrtTimer() 
-            // so the function's internal check (if (isRunning) return;) passes and the timer resumes.
+            // *** FIX: Add the full break duration to the elapsed time ***
+            // This ensures the main timer resumes from the correct, advanced position.
+            currentTrtElapsedMs += breakDurationMs; 
+
+            // Allow startTrtTimer() to run
             isRunning = false; 
             startTrtTimer(); 
         }
