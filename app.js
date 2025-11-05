@@ -102,7 +102,7 @@ function triggerBreak() {
         return;
     }
 
-    // 1. TRT timer is NOT PAUSED. It continues running.
+    // 1. TRT timer is NOT PAUSED. It continues running in the background.
     isBreakActive = true;
     updateStatus(`Break ${currentBreakIndex + 1} of ${breakCount} started!`, 'text-red-500');
 
@@ -115,16 +115,18 @@ function triggerBreak() {
     currentBreakIndex++; 
 
     if (currentBreakIndex < breakCount && contentTimeMs > 0) {
-        // Total time spent on content so far is: TRT Elapsed - (Total previous break durations)
-        const trtConsumedContentMs = currentTrtElapsedMs - ((currentBreakIndex - 1) * breakDurationMs);
-        const remainingContentTime = contentTimeMs - trtConsumedContentMs;
-        const remainingContentSegments = breakCount - currentBreakIndex + 1;
+        // FIX: Correctly calculate the number of remaining content segments
+        const totalSegments = breakCount + 1;
+        const remainingContentSegments = totalSegments - currentBreakIndex;
+        
+        // Content time consumed so far (excluding breaks)
+        const contentConsumedMs = currentTrtElapsedMs - ((currentBreakIndex - 1) * breakDurationMs);
+        const remainingContentTime = contentTimeMs - contentConsumedMs;
         
         // Calculate the new, equal duration for the remaining content segments
         const newSegmentDuration = remainingContentTime / remainingContentSegments;
         
-        // The NEXT break is scheduled after the CURRENT elapsed time (which includes the break duration
-        // as the TRT is still running) plus the new segment duration.
+        // The NEXT break is scheduled to start at the CURRENT TRT time plus the duration of the next content segment.
         nextBreakTrtStartMs = currentTrtElapsedMs + newSegmentDuration;
         
         console.log(`[Dynamic TRT] Next break (${currentBreakIndex + 1}) scheduled at TRT: ${formatTime(nextBreakTrtStartMs)}`);
@@ -153,8 +155,7 @@ function triggerBreak() {
             // 5. Update UI info panel
             document.getElementById('breaks-remaining').textContent = breakCount - currentBreakIndex;
             
-            // The TRT timer is already running and has naturally advanced during the break, 
-            // so no need to adjust currentTrtElapsedMs or restart the main timer.
+            // Since startTrtTimer is running continuously, we don't need to restart it.
         }
     }, 100);
 }
@@ -172,7 +173,7 @@ function startTrtTimer() {
         const delta = now - lastUpdateTime;
         lastUpdateTime = now;
 
-        currentTrtElapsedMs += delta; // KEY CHANGE: Always increment currentTrtElapsedMs
+        currentTrtElapsedMs += delta; // Always increment currentTrtElapsedMs
         
         // TRT Countdown Value (Remaining Time)
         let trtRemainingMs = totalRunTimeMs - currentTrtElapsedMs;
@@ -189,7 +190,6 @@ function startTrtTimer() {
         // Check for Auto-Trigger Break 
         if (currentTrtElapsedMs >= nextBreakTrtStartMs && currentBreakIndex < breakCount && !isBreakActive) {
             triggerBreak(); // Trigger the break based on time!
-            // Do NOT return here, let the displays update immediately.
         }
         
         // Update TRT Display
