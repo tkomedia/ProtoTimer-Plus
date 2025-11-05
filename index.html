@@ -29,7 +29,7 @@
         /* Style for the TRT timer (always on, white) */
         #trt-timer-value {
             /* TRT timer is huge */
-            font-size: 10rem; /* Fallback for older screens */
+            font-size: 10rem; 
             @media (min-width: 768px) {
                 font-size: 14rem;
             }
@@ -38,12 +38,11 @@
             }
         }
         
-        /* Style for the Break timer (hidden by default, smaller, red) */
+        /* FIX: Break Timer Size Increased to ~75% of the main display. */
         #break-timer-container {
-            /* Smaller font for the secondary timer */
-            font-size: 3rem; 
-            margin-top: 1rem; /* Add some separation below the TRT timer */
-            visibility: hidden; /* Start hidden */
+            font-size: 10rem; /* Increased size for prominence */
+            margin-top: 1rem; 
+            visibility: hidden; 
             opacity: 0;
             transition: opacity 0.3s ease;
         }
