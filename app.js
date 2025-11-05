@@ -118,19 +118,18 @@ function triggerBreak() {
         // Calculate TRT time that has been consumed by *content* so far
         const trtConsumedContentMs = currentTrtElapsedMs - ((currentBreakIndex - 1) * breakDurationMs);
         const remainingContentTime = contentTimeMs - trtConsumedContentMs;
-        const remainingContentSegments = breakCount - currentBreakIndex + 1; // Number of segments *including* the one that just started
+        const remainingContentSegments = breakCount - currentBreakIndex + 1;
         
         // Calculate the new, equal duration for the remaining content segments
         const newSegmentDuration = remainingContentTime / remainingContentSegments;
         
-        // The NEXT break is scheduled to start after this current break finishes, plus the new segment duration.
         nextBreakTrtStartMs = currentTrtElapsedMs + breakDurationMs + newSegmentDuration;
         
         console.log(`[Dynamic TRT] Next break (${currentBreakIndex + 1}) scheduled at TRT: ${formatTime(nextBreakTrtStartMs)}`);
 
     } else {
         // Last break (or only break) was just triggered. No more breaks to schedule.
-        nextBreakTrtStartMs = totalRunTimeMs + 1; // Disables future auto-trigger
+        nextBreakTrtStartMs = totalRunTimeMs + 1;
     }
 
     // 4. Start Break Countdown
@@ -151,8 +150,11 @@ function triggerBreak() {
             
             // 5. Update UI info panel
             document.getElementById('breaks-remaining').textContent = breakCount - currentBreakIndex;
-
-            startTrtTimer(); // Restart the TRT timer
+            
+            // FIX: Set isRunning to false BEFORE calling startTrtTimer() 
+            // so the function's internal check (if (isRunning) return;) passes and the timer resumes.
+            isRunning = false; 
+            startTrtTimer(); 
         }
     }, 100);
 }
