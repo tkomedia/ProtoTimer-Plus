@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ProtoTimer Plus - Dynamic Rundown</title>
+    <!-- Keep the high-contrast aesthetic with Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Import and apply Space Mono font */
@@ -38,10 +39,10 @@
             }
         }
         
-        /* FIX: Break Timer Size Increased to ~75% of the main display. */
+        /* Break Timer Size Increased to ~75% of the main display. */
         #break-timer-container {
             font-size: 10rem; /* Increased size for prominence */
-            margin-top: 1rem; 
+            margin-top: 0.5rem; /* Reduced margin for condensing */
             visibility: hidden; 
             opacity: 0;
             transition: opacity 0.3s ease;
@@ -50,26 +51,58 @@
             visibility: visible;
             opacity: 1;
         }
+        
+        /* Adjusted body and display area for vertical condensing */
+        body {
+            /* Removed min-h-screen to prevent unnecessary vertical expansion */
+            min-height: 0; 
+            padding: 0.5rem; /* Reduced overall padding */
+        }
+        #timer-display-area {
+            padding-top: 1rem; /* Reduced vertical padding */
+            padding-bottom: 2rem;
+            /* No flex-grow ensures this block is only as tall as its content */
+            position: relative;
+        }
+
+        /* Adjust top positions to bring them up */
+        .header-text {
+            position: absolute;
+            top: 1rem; /* Moved up */
+            font-medium;
+            text-white;
+            display: flex;
+            align-items: center;
+        }
+
     </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col p-4">
+<body class="bg-gray-900 text-white flex flex-col">
 
-    <div id="timer-display-area" class="relative flex-grow flex items-center justify-center">
+    <!-- 1. Dual Timer Display Area -->
+    <div id="timer-display-area" class="relative flex items-center justify-center">
         
-        <div class="absolute top-8 left-8 text-xl md:text-3xl font-medium text-white">
-            <span class="font-bold text-indigo-400">ProtoTimer Plus</span> 
+        <!-- Logo and Byline (Aligned to top-left) -->
+        <div class="header-text left-4">
+            <span class="font-bold text-xl md:text-3xl text-indigo-400">ProtoTimer Plus</span> 
+            <!-- Added Byline -->
+            <span class="text-white/80 text-base md:text-xl font-normal ml-2">by Terrence Ozaki</span>
         </div>
 
-        <div id="timer-mode" class="absolute top-8 right-8 text-xl md:text-3xl font-medium text-indigo-400">
+        <!-- Status/Mode Indicator (Aligned to top-right) -->
+        <div id="timer-mode" class="header-text right-4 text-xl md:text-3xl font-medium text-indigo-400">
             TRT Clock: <span id="clock-status" class="text-gray-400">00:00</span>
         </div>
         
-        <div class="main-display">
+        <!-- Main Timer Content - Moved up to align with header text -->
+        <div class="main-display pt-16 md:pt-20"> 
             
+            <!-- A. TRT Timer (Large, always visible, white) -->
             <div id="trt-timer-value" class="timer-font font-bold tracking-tight text-white">
                 28:30
             </div>
 
+            <!-- B. Break Timer (Appears BELOW the TRT timer) -->
             <div id="break-timer-container">
                 <div id="break-timer-value" class="timer-font font-bold tracking-tight text-red-500">
                     02:00
@@ -78,39 +111,46 @@
         </div>
     </div>
 
-    <div id="control-panel" class="bg-gray-800 p-6 rounded-xl shadow-2xl w-full max-w-4xl mx-auto space-y-6">
+    <!-- 2. Configuration and Controls Panel -->
+    <div id="control-panel" class="bg-gray-800 p-6 rounded-xl shadow-2xl w-full max-w-4xl mx-auto space-y-4"> <!-- Reduced vertical spacing -->
         <h2 class="text-xl font-semibold text-center text-indigo-400">Dynamic TRT Setup</h2>
 
+        <!-- Status Message -->
         <div id="status-message" class="text-center p-2 rounded-lg font-medium bg-gray-700">
             Status: <span class="text-yellow-400">Setup Required</span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Inputs: TRT, Break Count, Break Duration -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
             
+            <!-- Total Run Time (TRT) -->
             <label class="block">
                 <span class="text-sm font-medium text-gray-400">1. Total Run Time (TRT - M:SS)</span>
-                <input type="text" id="trt-input" value="28:30" class="mt-1 w-full p-3 border border-gray-600 bg-gray-700 rounded-lg text-lg focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="e.g., 28:30">
+                <input type="text" id="trt-input" value="28:30" class="mt-1 w-full p-2 border border-gray-600 bg-gray-700 rounded-lg text-lg focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="e.g., 28:30">
             </label>
 
+            <!-- Number of Breaks -->
             <label class="block">
                 <span class="text-sm font-medium text-gray-400">2. Number of Breaks</span>
-                <input type="number" id="break-count-input" value="3" class="mt-1 w-full p-3 border border-gray-600 bg-gray-700 rounded-lg text-lg focus:ring-indigo-500 focus:border-indigo-500 transition" min="0">
+                <input type="number" id="break-count-input" value="3" class="mt-1 w-full p-2 border border-gray-600 bg-gray-700 rounded-lg text-lg focus:ring-indigo-500 focus:border-indigo-500 transition" min="0">
             </label>
             
+            <!-- Break Duration -->
             <label class="block">
                 <span class="text-sm font-medium text-gray-400">3. Break Duration (M:SS)</span>
-                <input type="text" id="break-duration-input" value="2:00" class="mt-1 w-full p-3 border border-gray-600 bg-gray-700 rounded-lg text-lg focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="e.g., 2:00">
+                <input type="text" id="break-duration-input" value="2:00" class="mt-1 w-full p-2 border border-gray-600 bg-gray-700 rounded-lg text-lg focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="e.g., 2:00">
             </label>
         </div>
 
+        <!-- Control Buttons -->
         <div class="grid grid-cols-4 gap-4 pt-4 border-t border-gray-700">
-            <button id="start-trt-button" class="col-span-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl transition duration-200 shadow-md hover:shadow-lg">
+            <button id="start-trt-button" class="col-span-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-xl transition duration-200 shadow-md hover:shadow-lg">
                 Start TRT
             </button>
-            <button id="trigger-break-button" class="col-span-2 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl transition duration-200 shadow-md hover:shadow-lg">
+            <button id="trigger-break-button" class="col-span-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-xl transition duration-200 shadow-md hover:shadow-lg">
                 NEXT BREAK (Simulated OBS Trigger)
             </button>
-            <button id="reset-button" class="col-span-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-xl transition duration-200 shadow-md hover:shadow-lg">
+            <button id="reset-button" class="col-span-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-xl transition duration-200 shadow-md hover:shadow-lg">
                 Reset
             </button>
         </div>
@@ -122,6 +162,7 @@
 
     </div>
 
+    <!-- Link to the separate JavaScript file -->
     <script src="app.js" defer></script> 
 </body>
 </html>
